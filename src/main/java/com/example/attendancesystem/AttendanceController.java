@@ -1,95 +1,70 @@
 package com.example.attendancesystem;
 
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class AttendanceController
-{
-    private List<student> students = new ArrayList<>();
-    private List<Attendance> attendanceList = new ArrayList<>();
+public class AttendanceController {
 
-    @PostMapping("/students")
-    public String addStudent(@RequestBody student student)
-    {
-        students.add(student);
-        return "Student added";
-    }
+    @Autowired
+    private StudentRepository studentRepository;
 
-    @GetMapping("/students")
-    public List<student> getStudents()
-    {
-        return students;
-    }
+    @Autowired
+    private AttendanceRepository attendanceRepository;
 
+    // ✅ Add Attendance
     @PostMapping("/attendance")
-        public ResponseEntity<String> markAttendance(@RequestBody Attendance attendance)
-        {
-            boolean studentExists = false;
+    public ResponseEntity<ApiResponse<?>> markAttendance(@Valid @RequestBody Attendance attendance) {
 
-            for(student s : students)
-            {
-                if(s.getId() == attendance.getStudentId())
-                {
-                    studentExists = true;
-                    break;
-                }
-            }
+        Integer studentId = attendance.getStudent().getId();
 
-            if(!studentExists)
-            {
-                return ResponseEntity.status(404).body("Student not found");
-            }
+        student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
 
-            for(Attendance a : attendanceList)
-            {
-                if(a.getStudentId() == attendance.getStudentId() && a.getDate().equals(attendance.getDate()))
-                {
-                    return ResponseEntity.status(400).body("Attendance already marked for this date");
-                }
-            }
-            attendanceList.add(attendance);
-            return ResponseEntity.ok("Attendance Marked");
-        }
+        attendance.setStudent(student);
 
-        @GetMapping("/attendance")
-        public List<Attendance> getAttendance()
-        {
-            return attendanceList;
-        }
+        Attendance saved = attendanceRepository.save(attendance);
 
-        @GetMapping("/attendance/student/{id}")
-        public List<Attendance> getAttendanceByStudent(@PathVariable int id)
-        {
-            List<Attendance> result =  new ArrayList<>();
+        return ResponseEntity.ok(new ApiResponse<>("Attendance recorded", saved));
+    }
 
-            for(Attendance a : attendanceList)
-            {
-                if(a.getStudentId() == id)
-                {
-                    result.add(a);
-                }
-            }
-            return result;
-        }
+    // ✅ Get all
+    @GetMapping("/attendance")
+    public ResponseEntity<ApiResponse<List<AttendanceDTO>>> getAll() {
 
-        @GetMapping("/attendance/date/{date}")
-        public List<Attendance> getAttendanceByDate(@PathVariable String date)
-        {
-            List<Attendance> result = new ArrayList<>();
+        List<AttendanceDTO> list = attendanceRepository.findAll()
+                .stream()
+                .map(a -> new AttendanceDTO(
+                        a.getId(),
+                        a.getStudent().getId(),
+                        a.getStudent().getName(),
+                        a.getDate(),
+                        a.getStatus()
+                ))
+                .toList();
 
-            for(Attendance a : attendanceList)
-            {
-                if(a.getDate().equals(date))
-                {
-                    result.add(a);
-                }
-            }
-            return result;
-        }
+        return ResponseEntity.ok(new ApiResponse<>("Success", list));
+    }
 
+    // ✅ Filter by student
+    @GetMapping("/attendance/student/{id}")
+    public ResponseEntity<ApiResponse<List<AttendanceDTO>>> getByStudent(@PathVariable Integer id) {
 
+        List<AttendanceDTO> list = attendanceRepository.findByStudent_Id(id)
+                .stream()
+                .map(a -> new AttendanceDTO(
+                        a.getId(),
+                        a.getStudent().getId(),
+                        a.getStudent().getName(),
+                        a.getDate(),
+                        a.getStatus()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(new ApiResponse<>("Success", list));
+    }
 }

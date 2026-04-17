@@ -1,37 +1,35 @@
 package com.example.attendancesystem;
 
-public class Attendance
-{
-    private int id;
-    private int studentId;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
+@Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "date"}))
+public class Attendance {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private student student;
+
+    @NotBlank
     private String date;
+
+    @NotBlank
     private String status;
 
-    public Attendance(int id, int studentId, String date, String status)
-    {
-        this.id = id;
-        this.studentId = studentId;
-        this.date = date;
-        this.status = status;
-    }
+    public Attendance() {}
 
-    public int getId()
-    {
-        return id;
-    }
+    public Integer getId() { return id; }
+    public student getStudent() { return student; }
+    public void setStudent(student student) { this.student = student; }
 
-    public int getStudentId()
-    {
-        return studentId;
-    }
+    public String getDate() { return date; }
+    public void setDate(String date) { this.date = date; }
 
-    public String getDate()
-    {
-        return date;
-    }
-
-    public String getStatus()
-    {
-        return status;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

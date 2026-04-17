@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="page-shell">
+    <header class="hero">
+        <div class="hero__content">
+            <p class="eyebrow">Attendance Management</p>
+            <h1>Track daily presence with a cleaner, more professional workspace.</h1>
+            <p class="hero__text">
+                Review attendance records, filter by student, and submit new entries from one fast interface connected to your existing Spring Boot backend.
+            </p>
+            <div class="hero__actions">
+                <button class="btn btn--primary" type="button" data-scroll-target="#attendance-form-card">Mark Attendance</button>
+                <button class="btn btn--secondary" type="button" data-scroll-target="#records-card">View Records</button>
+            </div>
+        </div>
+        <div class="hero__panel">
+            <div class="metric-card">
+                <span>Total Records</span>
+                <strong id="metric-total">0</strong>
+            </div>
+            <div class="metric-card">
+                <span>Present Today</span>
+                <strong id="metric-present">0</strong>
+            </div>
+            <div class="metric-card">
+                <span>Students</span>
+                <strong id="metric-students">0</strong>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <section class="card card--form" id="attendance-form-card">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">New Entry</p>
+                    <h2>Mark attendance</h2>
+                </div>
+                <span class="badge">Live API</span>
+            </div>
+
+            <form id="attendance-form" class="attendance-form">
+                <label>
+                    <span>Student</span>
+                    <select id="student-select" required>
+                        <option value="">Select a student</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>Date</span>
+                    <input id="attendance-date" type="date" required>
+                </label>
+
+                <label>
+                    <span>Status</span>
+                    <select id="attendance-status" required>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                        <option value="Late">Late</option>
+                    </select>
+                </label>
+
+                <button class="btn btn--primary btn--full" type="submit">Save attendance</button>
+            </form>
+
+            <p id="form-message" class="form-message" aria-live="polite"></p>
+        </section>
+
+        <section class="card" id="students-card">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">Students</p>
+                    <h2>Available roster</h2>
+                </div>
+            </div>
+            <div id="student-list" class="student-list"></div>
+        </section>
+
+        <section class="card card--wide" id="records-card">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">Attendance Log</p>
+                    <h2>Recent records</h2>
+                </div>
+                <div class="toolbar">
+                    <label class="toolbar__field">
+                        <span>Filter by student</span>
+                        <select id="record-filter">
+                            <option value="">All students</option>
+                        </select>
+                    </label>
+                    <button class="btn btn--ghost" id="refresh-records" type="button">Refresh</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody id="records-body">
+                    <tr>
+                        <td colspan="4" class="empty-state">Loading attendance records...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
